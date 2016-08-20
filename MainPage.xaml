@@ -1,0 +1,40 @@
+﻿<Page
+    x:Class="QuickReturnHeaderListView.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:QuickReturnHeaderListView"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <local:MyListView x:Name="List"
+                          Background="Red"
+                          ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
+                          VirtualizingStackPanel.VirtualizationMode="Recycling">
+            <local:MyListView.Header>
+                <Border Name="MyHeader"
+                        Height="300"
+                        Background="AliceBlue"
+                        Padding="8">
+                    <StackPanel>
+                        <TextBlock Text="Header" />
+                        <TextBlock Text="Header Line 2" />
+                        <TextBlock Text="Header Line 3" />
+                        <TextBlock Text="Header Line 4" />
+                        <TextBlock Text="Header Line 5" />
+                        <TextBlock Text="Header Line 6" />
+                        <TextBlock Text="Header Line 7" />
+                    </StackPanel>
+                </Border>
+            </local:MyListView.Header>
+            <local:MyListView.ItemTemplate>
+                <DataTemplate x:DataType="local:Item">
+                    <Border Background="Beige">
+                        <TextBlock Text="{x:Bind Name}" />
+                    </Border>
+                </DataTemplate>
+            </local:MyListView.ItemTemplate>
+        </local:MyListView>
+    </Grid>
+</Page>
