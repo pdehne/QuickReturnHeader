@@ -11,12 +11,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <local:DebugListView x:Name="MyList"
-                  Grid.Row="0"
-                  ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
-                  ShowsScrollingPlaceholders="False">
+                             Grid.Row="0"
+                             ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
+                             ShowsScrollingPlaceholders="False">
             <ListView.Header>
-                <local:QuickReturnHeader x:Name="MyHeader"
-                                         TargetListView="{x:Bind MyList}">
+                <local:QuickReturnHeader x:Name="MyHeader" TargetListView="{x:Bind MyList}">
                     <Border Padding="0,0,0,2">
                         <StackPanel Background="#F0F0F0"
                                     BorderBrush="#D2D2D2"
@@ -39,8 +38,12 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </local:DebugListView>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="12">
-            <Button Name="ToggleQuickReturnButton" Click="ToggleQuickReturnButton_Click" Content="Toggle Quick Return"/>
+        <StackPanel Grid.Row="1"
+                    Margin="12"
+                    Orientation="Horizontal">
+            <Button Name="ToggleQuickReturnButton"
+                    Click="ToggleQuickReturnButton_Click"
+                    Content="Toggle Quick Return" />
         </StackPanel>
     </Grid>
 </Page>
