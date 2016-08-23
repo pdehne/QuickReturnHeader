@@ -5,37 +5,42 @@
       xmlns:local="using:QuickReturnHeaderListView"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <local:QuickReturnListView x:Name="List"
-                                   ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
-                                   ShowsScrollingPlaceholders="False">
-            <local:QuickReturnListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel Canvas.ZIndex="-1" />
-                </ItemsPanelTemplate>
-            </local:QuickReturnListView.ItemsPanel>
-            <local:QuickReturnListView.Header>
-                <Border Padding="0,0,0,2">
-                    <StackPanel Background="#F0F0F0"
-                                BorderBrush="#D2D2D2"
-                                BorderThickness="0,0,0,1"
-                                Padding="12">
-                        <TextBlock Text="Header Line 1" />
-                        <TextBlock Text="Header Line 2" />
-                        <TextBlock Text="Header Line 3" />
-                        <TextBlock Text="Header Line 4" />
-                        <TextBlock Text="Header Line 5" />
-                        <TextBlock Text="Header Line 6" />
-                        <TextBlock Text="Header Line 7" />
-                    </StackPanel>
-                </Border>
-            </local:QuickReturnListView.Header>
-            <local:QuickReturnListView.ItemTemplate>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <local:DebugListView x:Name="MyList"
+                  Grid.Row="0"
+                  ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
+                  ShowsScrollingPlaceholders="False">
+            <ListView.Header>
+                <local:QuickReturnHeader x:Name="MyHeader"
+                                         TargetListView="{x:Bind MyList}">
+                    <Border Padding="0,0,0,2">
+                        <StackPanel Background="#F0F0F0"
+                                    BorderBrush="#D2D2D2"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="12">
+                            <TextBlock Text="Header Line 1" />
+                            <TextBlock Text="Header Line 2" />
+                            <TextBlock Text="Header Line 3" />
+                            <TextBlock Text="Header Line 4" />
+                            <TextBlock Text="Header Line 5" />
+                            <TextBlock Text="Header Line 6" />
+                            <TextBlock Text="Header Line 7" />
+                        </StackPanel>
+                    </Border>
+                </local:QuickReturnHeader>
+            </ListView.Header>
+            <ListView.ItemTemplate>
                 <DataTemplate x:DataType="local:Item">
-                    <local:ItemControl />
+                    <TextBlock Text="{x:Bind Name}" />
                 </DataTemplate>
-            </local:QuickReturnListView.ItemTemplate>
-        </local:QuickReturnListView>
+            </ListView.ItemTemplate>
+        </local:DebugListView>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="12">
+            <Button Name="ToggleQuickReturnButton" Click="ToggleQuickReturnButton_Click" Content="Toggle Quick Return"/>
+        </StackPanel>
     </Grid>
 </Page>

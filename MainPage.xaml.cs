@@ -32,6 +32,11 @@ namespace QuickReturnHeaderListView
                 return itemsSource;
             }
         }
+
+        private void ToggleQuickReturnButton_Click(object sender, RoutedEventArgs e)
+        {
+            MyHeader.QuickReturnEnabled = !MyHeader.QuickReturnEnabled;
+        }
     }
 
     public class Item

@@ -1,4 +1,18 @@
-# QuickReturnHeaderListView
-ListView control with a quick return header for the Universal Windows Platform (UWP)
+# QuickReturnHeader
+Universal Windows Platform (UWP) quick return header control to be used with ListViews.
 
-![QuickReturnHeaderListView Demo](QuickReturnListviewDemo.gif)
+![Quick return header demo](QuickReturnListviewDemo.gif)
+
+## How to use
+
+Add the QuickReturnHeader class to your project. Then define a regular ListView
+and add a QuickReturnHeader to its header. Make sure to tell the header which
+ListView it belongs to using the TargetListView property:
+
+    <ListView x:Name="MyList">
+        <ListView.Header>
+            <local:QuickReturnHeader TargetListView="{x:Bind MyList}">
+				<TextBlock Text="Header" />
+            </local:QuickReturnHeader>
+        </ListView.Header>
+    </ListView>
