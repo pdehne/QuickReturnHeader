@@ -1,5 +1,4 @@
 # QuickReturnHeader
-Universal Windows Platform (UWP) quick return header control to be used with ListViews.
 
 ![Quick return header demo](QuickReturnListviewDemo.gif)
 
