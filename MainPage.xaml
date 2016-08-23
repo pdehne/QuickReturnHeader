@@ -8,17 +8,21 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <local:MyListView x:Name="List"
-                          Background="Red"
+        <local:QuickReturnListView x:Name="List"
                           ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
-                          VirtualizingStackPanel.VirtualizationMode="Recycling">
-            <local:MyListView.Header>
-                <Border Name="MyHeader"
-                        Height="300"
-                        Background="AliceBlue"
-                        Padding="8">
+                          ShowsScrollingPlaceholders="False">
+            <local:QuickReturnListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel Canvas.ZIndex="-1" />
+                </ItemsPanelTemplate>
+            </local:QuickReturnListView.ItemsPanel>
+            <local:QuickReturnListView.Header>
+                <Border Background="#FAFAFA"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="#D2D2D2"
+                        Padding="12">
                     <StackPanel>
-                        <TextBlock Text="Header" />
+                        <TextBlock Text="Header Line 1" />
                         <TextBlock Text="Header Line 2" />
                         <TextBlock Text="Header Line 3" />
                         <TextBlock Text="Header Line 4" />
@@ -27,14 +31,12 @@
                         <TextBlock Text="Header Line 7" />
                     </StackPanel>
                 </Border>
-            </local:MyListView.Header>
-            <local:MyListView.ItemTemplate>
+            </local:QuickReturnListView.Header>
+            <local:QuickReturnListView.ItemTemplate>
                 <DataTemplate x:DataType="local:Item">
-                    <Border Background="Beige">
-                        <TextBlock Text="{x:Bind Name}" />
-                    </Border>
+                    <local:ItemControl />
                 </DataTemplate>
-            </local:MyListView.ItemTemplate>
-        </local:MyListView>
+            </local:QuickReturnListView.ItemTemplate>
+        </local:QuickReturnListView>
     </Grid>
 </Page>
