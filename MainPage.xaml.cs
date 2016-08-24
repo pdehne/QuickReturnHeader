@@ -35,7 +35,7 @@ namespace QuickReturnHeaderListView
 
         private void ToggleQuickReturnButton_Click(object sender, RoutedEventArgs e)
         {
-            MyHeader.QuickReturnEnabled = !MyHeader.QuickReturnEnabled;
+            MyHeader.IsQuickReturnEnabled = !MyHeader.IsQuickReturnEnabled;
         }
     }
 

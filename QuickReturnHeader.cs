@@ -18,6 +18,9 @@ using Windows.UI.Xaml.Media;
 
 namespace QuickReturnHeaderListView
 {
+    /// <summary>
+    /// Quick return header control to be used with ListViews
+    /// </summary>
     public class QuickReturnHeader : ContentControl
     {
         public QuickReturnHeader()
@@ -25,8 +28,34 @@ namespace QuickReturnHeaderListView
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
         }
 
+        /// <summary>
+        /// Identifies the <see cref="IsQuickReturnEnabled"/> property.
+        /// </summary>
+        public static readonly DependencyProperty IsQuickReturnEnabledProperty =
+            DependencyProperty.Register(nameof(IsQuickReturnEnabled), typeof(bool), typeof(QuickReturnHeader), new PropertyMetadata(true, OnIsQuickReturnEnabledChanged));
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the quick return header is enabled.
+        /// If true the quick return behavior is used.
+        /// If false regular header behavior is used.
+        /// Default is true.
+        /// </summary>
+        public bool IsQuickReturnEnabled
+        {
+            get { return (bool)GetValue(IsQuickReturnEnabledProperty); }
+            set { SetValue(IsQuickReturnEnabledProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the ListView this header belongs to
+        /// </summary>
+        public ListView TargetListView { get; set; }
+
         protected override void OnApplyTemplate()
         {
+            SizeChanged -= QuickReturnHeader_SizeChanged;
+            SizeChanged += QuickReturnHeader_SizeChanged;
+
             if (TargetListView != null)
             {
                 scrollViewer = GetScrollViewer(TargetListView);
@@ -38,66 +67,87 @@ namespace QuickReturnHeaderListView
 
             if (scrollViewer != null)
             {
-                scrollViewer.ViewChanged += (sender, args) =>
-                {
-                    if (animationProperties != null)
-                    {
-                        float oldOffsetY = 0.0f;
-                        animationProperties.TryGetScalar("OffsetY", out oldOffsetY);
+                scrollViewer.ViewChanged -= ScrollViewer_ViewChanged;
+                scrollViewer.ViewChanged += ScrollViewer_ViewChanged;
+            }
+        }
 
-                        var delta = scrollViewer.VerticalOffset - previousVerticalScrollOffset;
-                        previousVerticalScrollOffset = scrollViewer.VerticalOffset;
-
-                        var newOffsetY = oldOffsetY - (float)delta;
-
-                        // Keep values within negativ header size and 0
-                        FrameworkElement header = (FrameworkElement)TargetListView.Header;
-                        newOffsetY = Math.Max((float)-header.ActualHeight, newOffsetY);
-                        newOffsetY = Math.Min(0, newOffsetY);
-
-                        if (oldOffsetY != newOffsetY)
-                            animationProperties.InsertScalar("OffsetY", newOffsetY);
-                    }
-                };
+        private static ScrollViewer GetScrollViewer(DependencyObject o)
+        {
+            if (o is ScrollViewer)
+            {
+                return o as ScrollViewer;
             }
 
-            SizeChanged += (sender, args) =>
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(o); i++)
             {
-                if (TargetListView != null)
+                var child = VisualTreeHelper.GetChild(o, i);
+
+                var result = GetScrollViewer(child);
+                if (result != null)
                 {
-                    if (QuickReturnEnabled)
-                        startAnimation();
+                    return result;
                 }
-            };
+            }
+
+            return null;
         }
 
-        public ListView TargetListView { get; set; }
-
-        public bool QuickReturnEnabled
-        {
-            get { return (bool)GetValue(QuickReturnEnabledProperty); }
-            set { SetValue(QuickReturnEnabledProperty, value); }
-        }
-
-        public static readonly DependencyProperty QuickReturnEnabledProperty =
-            DependencyProperty.Register("QuickReturnEnabled", typeof(bool),
-                typeof(QuickReturnHeader),
-                new PropertyMetadata(true, onQuickReturnEnabledChanged));
-
-        private static void onQuickReturnEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsQuickReturnEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var me = d as QuickReturnHeader;
 
-            if (me.QuickReturnEnabled)
-                me.startAnimation();
+            if (me.IsQuickReturnEnabled)
+            {
+                me.StartAnimation();
+            }
             else
-                me.stopAnimation();
+            {
+                me.StopAnimation();
+            }
         }
 
-        private void startAnimation()
+        private void QuickReturnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (TargetListView != null)
+            {
+                if (IsQuickReturnEnabled)
+                {
+                    StartAnimation();
+                }
+            }
+        }
+
+        private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            if (animationProperties != null)
+            {
+                float oldOffsetY = 0.0f;
+                animationProperties.TryGetScalar("OffsetY", out oldOffsetY);
+
+                var delta = scrollViewer.VerticalOffset - previousVerticalScrollOffset;
+                previousVerticalScrollOffset = scrollViewer.VerticalOffset;
+
+                var newOffsetY = oldOffsetY - (float)delta;
+
+                // Keep values within negativ header size and 0
+                FrameworkElement header = (FrameworkElement)TargetListView.Header;
+                newOffsetY = Math.Max((float)-header.ActualHeight, newOffsetY);
+                newOffsetY = Math.Min(0, newOffsetY);
+
+                if (oldOffsetY != newOffsetY)
+                {
+                    animationProperties.InsertScalar("OffsetY", newOffsetY);
+                }
+            }
+        }
+
+        private void StartAnimation()
         {
             if (scrollProperties == null)
+            {
                 scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
+            }
 
             var compositor = scrollProperties.Compositor;
 
@@ -114,13 +164,15 @@ namespace QuickReturnHeaderListView
 
             headerVisual = ElementCompositionPreview.GetElementVisual((UIElement)TargetListView.Header);
 
-            if (headerVisual != null && QuickReturnEnabled)
+            if (headerVisual != null && IsQuickReturnEnabled)
+            {
                 headerVisual.StartAnimation("Offset.Y", expressionAnimation);
+            }
         }
 
-        private void stopAnimation()
+        private void StopAnimation()
         {
-            if(headerVisual != null)
+            if (headerVisual != null)
             {
                 headerVisual.StopAnimation("Offset.Y");
                 animationProperties.InsertScalar("OffsetY", 0.0f);
@@ -131,24 +183,7 @@ namespace QuickReturnHeaderListView
             }
         }
 
-        private static ScrollViewer GetScrollViewer(DependencyObject o)
-        {
-            if (o is ScrollViewer)
-                return o as ScrollViewer;
-
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(o); i++)
-            {
-                var child = VisualTreeHelper.GetChild(o, i);
-
-                var result = GetScrollViewer(child);
-                if (result != null)
-                    return result;
-            }
-
-            return null;
-        }
-
-        ScrollViewer scrollViewer;
+        private ScrollViewer scrollViewer;
         private double previousVerticalScrollOffset;
         private CompositionPropertySet scrollProperties;
         private CompositionPropertySet animationProperties;
