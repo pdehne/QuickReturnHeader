@@ -47,6 +47,24 @@ namespace QuickReturnHeaderListView
         }
 
         /// <summary>
+        /// Identifies the <see cref="IsSticky"/> property.
+        /// </summary>
+        public static readonly DependencyProperty IsStickyProperty =
+            DependencyProperty.Register(nameof(IsSticky), typeof(bool), typeof(QuickReturnHeader), new PropertyMetadata(false, OnIsStickyChanged));
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the quick return header should always be visible.
+        /// If true the header is always visible.
+        /// If false the header will move out of view when scrolling down.
+        /// Default is false.
+        /// </summary>
+        public bool IsSticky
+        {
+            get { return (bool)GetValue(IsStickyProperty); }
+            set { SetValue(IsStickyProperty, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the ListView this header belongs to
         /// </summary>
         public ListView TargetListView { get; set; }
@@ -58,7 +76,8 @@ namespace QuickReturnHeaderListView
         {
             if (headerVisual != null && scrollViewer != null)
             {
-                FrameworkElement header = (FrameworkElement)TargetListView.Header;
+                previousVerticalScrollOffset = scrollViewer.VerticalOffset;
+
                 animationProperties.InsertScalar("OffsetY", 0.0f);
             }
         }
@@ -109,13 +128,31 @@ namespace QuickReturnHeaderListView
         {
             var me = d as QuickReturnHeader;
 
-            if (me.IsQuickReturnEnabled)
+            if (me.TargetListView != null)
             {
-                me.StartAnimation();
+                if (me.IsQuickReturnEnabled)
+                {
+                    me.StartAnimation();
+                }
+                else
+                {
+                    me.StopAnimation();
+                }
             }
-            else
+        }
+
+        private static void OnIsStickyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var me = d as QuickReturnHeader;
+
+            if (me.TargetListView != null)
             {
                 me.StopAnimation();
+
+                if (me.IsQuickReturnEnabled)
+                {
+                    me.StartAnimation();
+                }
             }
         }
 
@@ -123,6 +160,8 @@ namespace QuickReturnHeaderListView
         {
             if (TargetListView != null)
             {
+                StopAnimation();
+
                 if (IsQuickReturnEnabled)
                 {
                     StartAnimation();
@@ -134,22 +173,25 @@ namespace QuickReturnHeaderListView
         {
             if (animationProperties != null)
             {
-                float oldOffsetY = 0.0f;
-                animationProperties.TryGetScalar("OffsetY", out oldOffsetY);
-
-                var delta = scrollViewer.VerticalOffset - previousVerticalScrollOffset;
-                previousVerticalScrollOffset = scrollViewer.VerticalOffset;
-
-                var newOffsetY = oldOffsetY - (float)delta;
-
-                // Keep values within negativ header size and 0
-                FrameworkElement header = (FrameworkElement)TargetListView.Header;
-                newOffsetY = Math.Max((float)-header.ActualHeight, newOffsetY);
-                newOffsetY = Math.Min(0, newOffsetY);
-
-                if (oldOffsetY != newOffsetY)
+                if (!IsSticky)
                 {
-                    animationProperties.InsertScalar("OffsetY", newOffsetY);
+                    float oldOffsetY = 0.0f;
+                    animationProperties.TryGetScalar("OffsetY", out oldOffsetY);
+
+                    var delta = scrollViewer.VerticalOffset - previousVerticalScrollOffset;
+                    previousVerticalScrollOffset = scrollViewer.VerticalOffset;
+
+                    var newOffsetY = oldOffsetY - (float)delta;
+
+                    // Keep values within negativ header size and 0
+                    FrameworkElement header = (FrameworkElement)TargetListView.Header;
+                    newOffsetY = Math.Max((float)-header.ActualHeight, newOffsetY);
+                    newOffsetY = Math.Min(0, newOffsetY);
+
+                    if (oldOffsetY != newOffsetY)
+                    {
+                        animationProperties.InsertScalar("OffsetY", newOffsetY);
+                    }
                 }
             }
         }
@@ -166,11 +208,13 @@ namespace QuickReturnHeaderListView
             if (animationProperties == null)
             {
                 animationProperties = compositor.CreatePropertySet();
-                animationProperties.InsertScalar("OffsetY", 0.0f);
             }
 
-            var expressionAnimation = compositor.CreateExpressionAnimation("Floor(animationProperties.OffsetY - ScrollingProperties.Translation.Y)");
+            previousVerticalScrollOffset = scrollViewer.VerticalOffset;
 
+            animationProperties.InsertScalar("OffsetY", 0.0f);
+
+            ExpressionAnimation expressionAnimation = compositor.CreateExpressionAnimation("Floor(animationProperties.OffsetY - ScrollingProperties.Translation.Y)");
             expressionAnimation.SetReferenceParameter("ScrollingProperties", scrollProperties);
             expressionAnimation.SetReferenceParameter("animationProperties", animationProperties);
 

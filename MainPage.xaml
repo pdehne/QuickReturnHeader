@@ -44,6 +44,14 @@
             <Button Name="ToggleQuickReturnButton"
                     Click="ToggleQuickReturnButton_Click"
                     Content="Toggle Quick Return" />
+            <Button Name="ShowHeaderButton"
+                    Margin="16,0,0,0"
+                    Click="ShowHeaderButton_Click"
+                    Content="Show Header" />
+            <Button Name="ToggleIsStickyButton"
+                    Margin="16,0,0,0"
+                    Click="ToggleIsStickyButton_Click"
+                    Content="Toggle Is Sticky" />
         </StackPanel>
     </Grid>
 </Page>

@@ -37,6 +37,16 @@ namespace QuickReturnHeaderListView
         {
             MyHeader.IsQuickReturnEnabled = !MyHeader.IsQuickReturnEnabled;
         }
+
+        private void ToggleIsStickyButton_Click(object sender, RoutedEventArgs e)
+        {
+            MyHeader.IsSticky = !MyHeader.IsSticky;
+        }
+
+        private void ShowHeaderButton_Click(object sender, RoutedEventArgs e)
+        {
+            MyHeader.Show();
+        }
     }
 
     public class Item
