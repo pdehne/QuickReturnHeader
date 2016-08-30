@@ -217,17 +217,19 @@ namespace QuickReturnHeaderListView
             }
 
             _previousVerticalScrollOffset = _scrollViewer.VerticalOffset;
+            _headerVisual = ElementCompositionPreview.GetElementVisual((UIElement)TargetListView.Header);
 
             _animationProperties.InsertScalar("OffsetY", 0.0f);
 
-            ExpressionAnimation expressionAnimation = compositor.CreateExpressionAnimation("Floor(animationProperties.OffsetY - ScrollingProperties.Translation.Y)");
+            ExpressionAnimation expressionAnimation = compositor.CreateExpressionAnimation($"max(animationProperties.OffsetY - ScrollingProperties.Translation.Y, headerVisual.Size.Y)");
             expressionAnimation.SetReferenceParameter("ScrollingProperties", _scrollProperties);
             expressionAnimation.SetReferenceParameter("animationProperties", _animationProperties);
-
-            _headerVisual = ElementCompositionPreview.GetElementVisual((UIElement)TargetListView.Header);
+            expressionAnimation.SetReferenceParameter("headerVisual", _headerVisual);
 
             if (_headerVisual != null && IsQuickReturnEnabled)
+            {
                 _headerVisual.StartAnimation("Offset.Y", expressionAnimation);
+            }
         }
 
         private void StopAnimation()
