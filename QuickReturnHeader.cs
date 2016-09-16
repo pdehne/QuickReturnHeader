@@ -118,6 +118,11 @@ namespace QuickReturnHeaderListView
                 _scrollViewer.ViewChanged -= ScrollViewer_ViewChanged;
                 _scrollViewer.ViewChanged += ScrollViewer_ViewChanged;
             }
+
+            if (IsQuickReturnEnabled)
+            {
+                StartAnimation();
+            }
         }
 
         private static ScrollViewer GetScrollViewer(DependencyObject o)
@@ -221,6 +226,11 @@ namespace QuickReturnHeaderListView
                 return;
             }
 
+            if (_scrollViewer == null)
+            {
+                return;
+            }
+
             if (_scrollProperties == null)
             {
                 _scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(_scrollViewer);
@@ -238,7 +248,7 @@ namespace QuickReturnHeaderListView
 
             _animationProperties.InsertScalar("OffsetY", 0.0f);
 
-            ExpressionAnimation expressionAnimation = compositor.CreateExpressionAnimation($"max(animationProperties.OffsetY - ScrollingProperties.Translation.Y, headerVisual.Size.Y)");
+            ExpressionAnimation expressionAnimation = compositor.CreateExpressionAnimation($"max(animationProperties.OffsetY - ScrollingProperties.Translation.Y, 0)");
             expressionAnimation.SetReferenceParameter("ScrollingProperties", _scrollProperties);
             expressionAnimation.SetReferenceParameter("animationProperties", _animationProperties);
             expressionAnimation.SetReferenceParameter("headerVisual", _headerVisual);
