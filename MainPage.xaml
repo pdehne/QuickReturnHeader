@@ -22,7 +22,7 @@
                              ItemsSource="{x:Bind ItemsSource, Mode=OneWay}"
                              ShowsScrollingPlaceholders="False">
             <ListView.Header>
-                <local:QuickReturnHeader x:Name="MyHeader" TargetListView="{x:Bind MyList}">
+                <local:QuickReturnHeader x:Name="MyHeader" TargetListViewBase="{x:Bind MyList}">
                     <Border Padding="0,0,0,2">
                         <StackPanel Background="#F0F0F0"
                                     BorderBrush="#D2D2D2"

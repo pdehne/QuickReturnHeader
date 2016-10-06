@@ -60,10 +60,10 @@ namespace QuickReturnHeaderListView
             DependencyProperty.Register(nameof(IsSticky), typeof(bool), typeof(QuickReturnHeader), new PropertyMetadata(false, OnIsStickyChanged));
 
         /// <summary>
-        /// Identifies the <see cref="TargetListView"/> property.
+        /// Identifies the <see cref="TargetListViewBase"/> property.
         /// </summary>
-        public static readonly DependencyProperty TargetListViewProperty =
-            DependencyProperty.Register(nameof(TargetListView), typeof(ListView), typeof(QuickReturnHeader), new PropertyMetadata(null));
+        public static readonly DependencyProperty TargetListViewBaseProperty =
+            DependencyProperty.Register(nameof(TargetListViewBase), typeof(ListViewBase), typeof(QuickReturnHeader), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value indicating whether the quick return header should always be visible.
@@ -78,12 +78,12 @@ namespace QuickReturnHeaderListView
         }
 
         /// <summary>
-        /// Gets or sets the ListView this header belongs to
+        /// Gets or sets the container this header belongs to
         /// </summary>
-        public ListView TargetListView
+        public ListView TargetListViewBase
         {
-            get { return (ListView)GetValue(TargetListViewProperty); }
-            set { SetValue(TargetListViewProperty, value); }
+            get { return (ListView)GetValue(TargetListViewBaseProperty); }
+            set { SetValue(TargetListViewBaseProperty, value); }
         }
 
         /// <summary>
@@ -104,12 +104,12 @@ namespace QuickReturnHeaderListView
             SizeChanged -= QuickReturnHeader_SizeChanged;
             SizeChanged += QuickReturnHeader_SizeChanged;
 
-            if (TargetListView != null)
+            if (TargetListViewBase != null)
             {
-                _scrollViewer = GetScrollViewer(TargetListView);
+                _scrollViewer = GetScrollViewer(TargetListViewBase);
 
                 // Place items below header
-                var panel = TargetListView.ItemsPanelRoot;
+                var panel = TargetListViewBase.ItemsPanelRoot;
                 Canvas.SetZIndex(panel, -1);
             }
 
@@ -150,7 +150,7 @@ namespace QuickReturnHeaderListView
         {
             var me = d as QuickReturnHeader;
 
-            if (me.TargetListView != null)
+            if (me.TargetListViewBase != null)
             {
                 if (me.IsQuickReturnEnabled)
                 {
@@ -167,7 +167,7 @@ namespace QuickReturnHeaderListView
         {
             var me = d as QuickReturnHeader;
 
-            if (me.TargetListView != null)
+            if (me.TargetListViewBase != null)
             {
                 me.StopAnimation();
 
@@ -180,7 +180,7 @@ namespace QuickReturnHeaderListView
 
         private void QuickReturnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (TargetListView != null)
+            if (TargetListViewBase != null)
             {
                 StopAnimation();
 
@@ -206,7 +206,7 @@ namespace QuickReturnHeaderListView
                     var newOffsetY = oldOffsetY - (float)delta;
 
                     // Keep values within negativ header size and 0
-                    FrameworkElement header = (FrameworkElement)TargetListView.Header;
+                    FrameworkElement header = (FrameworkElement)TargetListViewBase.Header;
                     newOffsetY = Math.Max((float)-header.ActualHeight, newOffsetY);
                     newOffsetY = Math.Min(0, newOffsetY);
 
@@ -244,7 +244,7 @@ namespace QuickReturnHeaderListView
             }
 
             _previousVerticalScrollOffset = _scrollViewer.VerticalOffset;
-            _headerVisual = ElementCompositionPreview.GetElementVisual((UIElement)TargetListView.Header);
+            _headerVisual = ElementCompositionPreview.GetElementVisual((UIElement)TargetListViewBase.Header);
 
             _animationProperties.InsertScalar("OffsetY", 0.0f);
 
